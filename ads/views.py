@@ -1,6 +1,6 @@
 import json
 
-
+from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
@@ -10,6 +10,7 @@ from django.views.generic import DetailView, ListView, UpdateView, DeleteView, C
 
 
 from ads.models import Category, Ad
+from homework_28 import settings
 from users.models import User
 
 
@@ -34,7 +35,8 @@ class AdDetailView(DetailView):
             "address": ad.address,
             "is_published": ad.is_published,
             "category_id": ad.category.id,
-            "category": ad.category.name
+            "category": ad.category.name,
+            "image": ad.image.url if ad.image else None
         }
         return JsonResponse(response, safe=False, json_dumps_params={"ensure_ascii": False, "indent": 4})
 
@@ -46,14 +48,37 @@ class AdListView(ListView):
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
 
-        self.object_list = self.object_list.order_by("id")
+        self.object_list = self.object_list.select_related("author").order_by("author")
 
-        response = []
-        for ad in self.object_list:
-            response.append({
-                "id": ad.id,
-                "name": ad.name,
-            })
+        paginator = Paginator(self.object_list, settings.TOTAL_ON_PAGE)
+        page_number = int(request.GET.get("page", 1))
+
+        page_obj = paginator.get_page(page_number)
+
+        advertising = []
+        for ad in page_obj:
+            advertising.append(
+                {
+                    "id": ad.id,
+                    "name": ad.name,
+                    "author_id": ad.author.id,
+                    "author": ad.author.username,
+                    "price": ad.price,
+                    "description": ad.description,
+                    "address": ad.address,
+                    "is_published": ad.is_published,
+                    "category_id": ad.category.id,
+                    "category": ad.category.name,
+                    "image": ad.image.url if ad.image else None,
+                }
+            )
+
+        response = {
+            "items": advertising,
+            "num_pages": paginator.num_pages,
+            "total": paginator.count
+        }
+
         return JsonResponse(response, safe=False, json_dumps_params={"ensure_ascii": False, "indent": 4})
 
 
@@ -116,9 +141,28 @@ class AdUpdateView(UpdateView):
                 "description": self.object.description,
                 "address": self.object.address,
                 "is_published": self.object.is_published,
-                "category": self.object.category.name
+                "category": self.object.category.name,
+                "image": self.object.image.url if self.object.image else None,
             }
         )
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class AdImageView(UpdateView):
+    model = Ad
+    fields = ["name", "image"]
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        self.object.image = request.FILES["image"]
+        self.object.save()
+
+        return JsonResponse({
+            "id": self.object.id,
+            "name": self.object.name,
+            "image": self.object.image.url if self.object.image else None,
+        })
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -140,7 +184,7 @@ class CategoryListView(ListView):
     def get(self, request, *args, **kwargs):
         super().get(request, *args, **kwargs)
 
-        self.object_list = self.object_list.order_by("id")
+        self.object_list = self.object_list.order_by("name")
 
         response = []
         for category in self.object_list:
