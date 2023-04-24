@@ -10,7 +10,7 @@ from django.views.generic import DetailView, ListView, UpdateView, DeleteView, C
 
 
 from ads.models import Category, Ad
-from homework_28 import settings
+from homework_29 import settings
 from users.models import User
 
 

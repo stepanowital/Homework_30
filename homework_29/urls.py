@@ -1,4 +1,4 @@
-"""homework_28 URL Configuration
+"""homework_29 URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.1/topics/http/urls/
@@ -15,9 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework import routers
 
 from ads import views
 from ads.views import root
+from users.views import UserListView, LocationViewSet
+
+router = routers.SimpleRouter()
+router.register('location', LocationViewSet)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,3 +32,5 @@ urlpatterns = [
     path('cat/', include('ads.urls.cat')),
     path('user/', include('ads.urls.user')),
 ]
+
+urlpatterns += router.urls
