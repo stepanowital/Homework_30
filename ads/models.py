@@ -18,7 +18,7 @@ class Ad(models.Model):
     author = models.ForeignKey('users.User', on_delete=models.CASCADE)
     price = models.PositiveIntegerField()
     description = models.TextField()
-    address = models.CharField(max_length=300)
+    # address = models.CharField(max_length=300)
     is_published = models.BooleanField()
     # category_id = models.ForeignKey(Category, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)

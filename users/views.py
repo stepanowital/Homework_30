@@ -1,6 +1,6 @@
 import json
 
-
+from django.db.models import Count, Q
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView
 from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
 from rest_framework.pagination import PageNumberPagination
@@ -18,7 +18,7 @@ class UserPagination(PageNumberPagination):
 
 
 class UserListView(ListAPIView):
-    queryset = User.objects.order_by("username")
+    queryset = User.objects.annotate(total_ads=Count("ad", filter=Q(ad__is_published=True))).order_by("-total_ads")
     serializer_class = UserListSerializer
     pagination_class = UserPagination
 

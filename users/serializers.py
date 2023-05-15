@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from rest_framework.fields import SerializerMethodField
+from rest_framework.fields import SerializerMethodField, IntegerField
 
 from users.models import User, Location
 
@@ -12,10 +12,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserListSerializer(serializers.ModelSerializer):
-    total_ads = SerializerMethodField()
+    total_ads = IntegerField()
 
-    def get_total_ads(self, user):
-        return user.ad_set.filter(is_published=True).count()
+    # total_ads = SerializerMethodField()
+    #
+    # def get_total_ads(self, user):
+    #     return user.ad_set.filter(is_published=True).count()
 
     class Meta:
         model = User
