@@ -7,7 +7,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ModelViewSet
 
 from ads.models import Ad
-from homework_29 import settings
+from homework_30 import settings
 from users.models import User, Location
 from users.serializers import UserSerializer, UserDetailSerializer, UserListSerializer, \
     LocationSerializer

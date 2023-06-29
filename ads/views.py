@@ -9,7 +9,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from ads.models import Category, Ad
 from ads.serializers import AdSerializer, AdDetailSerializer, AdListSerializer
-from homework_29 import settings
+from homework_30 import settings
 
 
 # Create your views here.
